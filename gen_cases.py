@@ -164,12 +164,40 @@ def data_generator(solves=5000):
     solutions = np.concatenate(solutions, axis=0)
     return stickers, pieces, solutions
 
-stickers, pieces, solutions = data_generator(solves=50000)
 
 SAVE_STICKERS = "data/train_stickers.npy"
 SAVE_PIECES = "data/train_pieces.npy"
 SAVE_SOLUTIONS = "data/train_solutions.npy"
 
-np.save(SAVE_STICKERS, stickers)
-np.save(SAVE_PIECES, pieces)
-np.save(SAVE_SOLUTIONS, solutions)
+if  __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(allow_abbrev=True)
+    parser.add_argument(
+        '--prefix',
+        help="output data prefix",
+        type=str,
+    )
+
+    parser.add_argument(
+        '--suffix',
+        help="output data suffix",
+        type=str,
+    )
+    args = parser.parse_args()
+    file_prefix = args.prefix if args.prefix else "data/train_"
+    file_suffix = args.suffix if args.suffix else ""
+
+    SAVE_STICKERS = "{}stickers{}.npy".format(file_prefix, file_suffix)
+    SAVE_PIECES = "{}pieces{}.npy".format(file_prefix, file_suffix)
+    SAVE_SOLUTIONS = "{}solutions{}.npy".format(file_prefix, file_suffix)
+
+
+    print("Saving to: \n{}\n{}\n{}".format(
+        SAVE_STICKERS, SAVE_PIECES, SAVE_SOLUTIONS))
+
+    stickers, pieces, solutions = data_generator(solves=50000)
+
+    np.save(SAVE_STICKERS, stickers)
+    np.save(SAVE_PIECES, pieces)
+    np.save(SAVE_SOLUTIONS, solutions)
