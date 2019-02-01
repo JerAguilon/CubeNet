@@ -130,8 +130,8 @@ def unfold_case(scramble, undo_scramble):
     X_pieces = np.zeros((n, 8))
     y = np.zeros(n)
     for i in range(n):
-        c.move(*convert_move(scramble[n - i - 1]))
-        solution = undo_scramble[i]
+        c.move(*convert_move(scramble[i]))
+        solution = undo_scramble[n - i - 1]
         stickers = c.stickers.copy()
         state = np.asarray(stickers).reshape(12, 2, 1)
         X_stickers[i] = state

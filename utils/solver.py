@@ -144,16 +144,27 @@ if __name__ == '__main__':
     scrambles = []
     for scramble_length in range(1, 10):
         print("Processing scrambles of length " + str(scramble_length))
-        for i in range(50000):
-            if i % 1000 == 0:
-                print("{}/{}".format(i, 50000))
-                print("Found {} scrambles".format(len(scrambles)))
-            scramble = generate_case(scramble_length)
-            s = py222.doAlgStr(py222.initState(), ' '.join(scramble))
 
+        total_possible = 9**scramble_length
+        this_set = set()
+
+        explored = set()
+        for i in range(5000):
+            if i % 100 == 0:
+                print("{}/{}".format(i, 5000))
+            scramble = ' '.join(generate_case(scramble_length))
+            if scramble in explored:
+                continue
+
+            explored.add(scramble)
+            s = py222.doAlgStr(py222.initState(), scramble)
             total = solveCube(s)
             if total == 1:
-                scrambles.append(scramble)
+                this_set.add(scramble)
+                if len(this_set) == total_possible:
+                    break
+        scrambles += list(this_set)
+        print(len(scrambles))
     print("Found {} scrambles".format(len(scrambles)))
     with open('scrambles.pkl', 'wb') as fp:
         pickle.dump(scrambles, fp)
