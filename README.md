@@ -23,6 +23,6 @@ that the neural net is inconsistent in performance.
 
 ## Further approaches
 
-1. Attempt to train on solutions that have **1 unique optimal solution**. A corpus of scrambles that have 
+1. Attempt to train on scrambles that have **1 unique optimal solution**. A corpus of ~10,000 scrambles that have 
    this property has been developed. Perhaps this will help the network generalize.
 2. Implement deep-Q learning
