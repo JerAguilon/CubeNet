@@ -127,47 +127,57 @@ def unfold_case(scramble, undo_scramble):
     c = Cube(2)
     n = len(scramble)
     X_stickers = np.zeros( (n, 12, 2, 1) )
-    X_pieces = np.zeros((n, 8))
+    X_next_states = np.zeros( (n, 9, 12, 2, 1) )
+
     y = np.zeros(n)
     for i in range(n):
         c.move(*convert_move(scramble[i]))
         solution = undo_scramble[n - i - 1]
         stickers = c.stickers.copy()
         state = np.asarray(stickers).reshape(12, 2, 1)
+        # 1. Create the sticker state
         X_stickers[i] = state
-        for j, piece in enumerate(all_pieces):
-            piece_stickers = []
-            for sticker_pos in piece:
-                sticker_color = stickers[
-                    sticker_pos[0], sticker_pos[1], sticker_pos[2]
-                ]
-                piece_stickers.append(sticker_color)
-            X_pieces[i][j] = get_block_colors(piece_stickers).value
+
+        # 2. TODO: create the candidate moves
+        candidate_solutions= [
+            "R", "U", "F",
+            "R'", "U'", "F'",
+            "R2", "U2", "F2",
+        ]
+        for i_move, move in enumerate(candidate_solutions):
+            # perform the move
+            c.move(*convert_move(move))
+
+            stickers = c.stickers.copy()
+            next_state = np.asarray(stickers).reshape(12, 2, 1)
+            X_next_states[i][i_move] = next_state
+
+            # undo the move
+            c.move(*convert_move(counter_move(move)))
+
+        # 3. Create the label
         y[i] = move_mapping[solution]
-    return X_stickers, X_pieces, y
+
+    # TODO: remove pieces
+    return X_stickers, X_next_states, y
 
 
 def data_generator(solves=5000):
-    stickers = []
-    pieces = []
-    solutions = []
+    stickers = [] # stickers given a case
+    look_ahead = [] # appearance of the cube given each move
+    solutions = [] # correct move
     for i in range(solves):
         if i % 100 == 0:
             print(f'{i}/{solves} completed')
         scramble, reverse = generate_case(moves=10)
-        s, p, y = unfold_case(scramble, reverse)
+        s, n, y = unfold_case(scramble, reverse)
         stickers.append(s)
-        pieces.append(p)
+        look_ahead.append(n)
         solutions.append(y)
     stickers = np.concatenate(stickers, axis=0)
-    pieces = np.concatenate(pieces, axis=0)
+    look_ahead = np.concatenate(look_ahead, axis=0)
     solutions = np.concatenate(solutions, axis=0)
-    return stickers, pieces, solutions
-
-
-SAVE_STICKERS = "data/train_stickers.npy"
-SAVE_PIECES = "data/train_pieces.npy"
-SAVE_SOLUTIONS = "data/train_solutions.npy"
+    return stickers, look_ahead, solutions
 
 if  __name__ == "__main__":
     import argparse
@@ -189,15 +199,15 @@ if  __name__ == "__main__":
     file_suffix = args.suffix if args.suffix else ""
 
     SAVE_STICKERS = "{}stickers{}.npy".format(file_prefix, file_suffix)
-    SAVE_PIECES = "{}pieces{}.npy".format(file_prefix, file_suffix)
+    SAVE_CANDIDATES = "{}candidates{}.npy".format(file_prefix, file_suffix)
     SAVE_SOLUTIONS = "{}solutions{}.npy".format(file_prefix, file_suffix)
 
 
     print("Saving to: \n{}\n{}\n{}".format(
-        SAVE_STICKERS, SAVE_PIECES, SAVE_SOLUTIONS))
+        SAVE_STICKERS, SAVE_CANDIDATES, SAVE_SOLUTIONS))
 
     stickers, pieces, solutions = data_generator(solves=50000)
 
     np.save(SAVE_STICKERS, stickers)
-    np.save(SAVE_PIECES, pieces)
+    np.save(SAVE_CANDIDATES, pieces)
     np.save(SAVE_SOLUTIONS, solutions)
