@@ -17,7 +17,7 @@ conda==4.6.1
 cryptography==2.4.2
 cycler==0.10.0
 Cython==0.29.3
-dask==0.19.0
+dask==2021.10.0
 decorator==4.3.0
 dill==0.2.9
 entrypoints==0.3
