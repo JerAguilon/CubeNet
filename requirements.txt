@@ -32,7 +32,7 @@ grpcio==1.18.0
 gym==0.10.9
 -e git+https://github.com/vivek3141/rubiks-cube-ai.git@754eccbd2beacad0f3c6441f719edcf93fc6763f#egg=gym_Rubiks_Cube&subdirectory=env
 h5py==2.7.1
-html5lib==0.9999999
+html5lib==0.999999999
 idna==2.8
 imageio==2.4.1
 ipykernel==5.1.0
